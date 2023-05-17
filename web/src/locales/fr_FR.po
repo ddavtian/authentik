@@ -403,7 +403,7 @@ msgstr "Paramètres avancés"
 msgid "Affected model:"
 msgstr "Modèle affecté :"
 
-#: src/admin/events/RuleListPage.ts
+#: src/admin/events/utils.ts
 msgid "Alert"
 msgstr "Alerte"
 
@@ -1975,6 +1975,10 @@ msgstr "Flux par défaut"
 msgid "Default?"
 msgstr "Par défaut ?"
 
+#: src/user/LibraryPage/ApplicationEmptyState.ts
+msgid "Define a new application"
+msgstr ""
+
 #: src/admin/events/TransportListPage.ts
 msgid "Define how notifications are sent to users, like Email or Webhook."
 msgstr "Définit les méthodes d'envoi des notifications aux utilisateurs, telles que email ou webhook."
@@ -2384,8 +2388,12 @@ msgid "Either input a full URL, a relative path, or use 'fa://fa-test' to use th
 msgstr ""
 
 #: src/user/LibraryPage.ts
-msgid "Either no applications are defined, or you don't have access to any."
-msgstr "Soit aucune application n'est définie, soit vous n'en avez accès à aucune."
+#~ msgid "Either no applications are defined, or you don't have access to any."
+#~ msgstr "Soit aucune application n'est définie, soit vous n'en avez accès à aucune."
+
+#: src/user/LibraryPage/ApplicationEmptyState.ts
+msgid "Either no applications are defined, or you don’t have access to any."
+msgstr ""
 
 #: src/admin/events/TransportForm.ts
 #: src/admin/stages/identification/IdentificationStageForm.ts
@@ -3724,7 +3732,8 @@ msgstr "Charger les serveurs"
 #: src/flow/stages/prompt/PromptStage.ts
 #: src/flow/stages/RedirectStage.ts
 #: src/flow/stages/user_login/UserLoginStage.ts
-#: src/user/LibraryPage.ts
+#: src/user/LibraryPage/helpers.ts
+#: src/user/LibraryPage/LibraryPage.ts
 #: src/user/user-settings/details/stages/prompt/PromptStage.ts
 #: src/user/user-settings/details/UserSettingsFlowExecutor.ts
 #: src/user/user-settings/details/UserSettingsFlowExecutor.ts
@@ -3991,11 +4000,12 @@ msgstr ""
 #~ msgid "Monitor"
 #~ msgstr "Surveiller"
 
-#: src/user/LibraryPage.ts
+#: src/user/LibraryPage/LibraryPageImpl.ts
 msgid "My applications"
 msgstr "Mes applications"
 
-#: src/user/LibraryPage.ts
+#: src/user/LibraryPage/LibraryPage.ts
+#: src/user/LibraryPage/LibraryPageImpl.ts
 msgid "My Applications"
 msgstr "Mes Applications"
 
@@ -4226,7 +4236,7 @@ msgstr ""
 #~ msgid "No application required."
 #~ msgstr ""
 
-#: src/user/LibraryPage.ts
+#: src/user/LibraryPage/ApplicationEmptyState.ts
 msgid "No Applications available."
 msgstr "Aucune Application disponible."
 
@@ -4359,7 +4369,7 @@ msgstr "Pas vous ?"
 msgid "Notes"
 msgstr ""
 
-#: src/admin/events/RuleListPage.ts
+#: src/admin/events/utils.ts
 msgid "Notice"
 msgstr "Note"
 
@@ -5110,6 +5120,10 @@ msgstr "Se ré-authentifier avec Plex"
 #~ msgid "Re-evaluate policies"
 #~ msgstr "Ré-évaluer les politiques"
 
+#: src/user/LibraryPage/ApplicationEmptyState.ts
+msgid "Read the documentation on how to define new applications."
+msgstr ""
+
 #: src/flow/stages/authenticator_validate/AuthenticatorValidateStage.ts
 msgid "Receive a push notification on your device."
 msgstr "Recevoir une notification push sur votre téléphone."
@@ -5508,7 +5522,7 @@ msgid "Search mode"
 msgstr ""
 
 #: src/elements/table/TableSearch.ts
-#: src/user/LibraryPage.ts
+#: src/user/LibraryPage/ApplicationSearch.ts
 msgid "Search..."
 msgstr "Rechercher..."
 
@@ -7127,8 +7141,8 @@ msgstr ""
 msgid "Unknown proxy mode"
 msgstr ""
 
-#: src/admin/events/RuleListPage.ts
-#: src/admin/events/RuleListPage.ts
+#: src/admin/events/utils.ts
+#: src/admin/events/utils.ts
 msgid "Unknown severity"
 msgstr ""
 
@@ -7781,7 +7795,7 @@ msgstr ""
 #: src/admin/admin-overview/cards/SystemStatusCard.ts
 #: src/admin/admin-overview/cards/SystemStatusCard.ts
 #: src/admin/blueprints/BlueprintListPage.ts
-#: src/admin/events/RuleListPage.ts
+#: src/admin/events/utils.ts
 #: src/admin/system-tasks/SystemTaskListPage.ts
 msgid "Warning"
 msgstr "Avertissement"
@@ -7806,6 +7820,10 @@ msgstr "Attention : aucune étape d’invitation n’a été ajoutée à aucun f
 msgid "Warning: Policy is not assigned."
 msgstr "Avertissement : la politique n'est pas assignée."
 
+#: src/admin/providers/scim/SCIMProviderViewPage.ts
+msgid "Warning: Provider is not assigned to an application as backchannel provider."
+msgstr ""
+
 #: src/admin/providers/oauth2/OAuth2ProviderViewPage.ts
 #: src/admin/providers/proxy/ProxyProviderViewPage.ts
 #: src/admin/providers/saml/SAMLProviderViewPage.ts
@@ -7814,6 +7832,7 @@ msgstr ""
 
 #: src/admin/providers/ldap/LDAPProviderViewPage.ts
 #: src/admin/providers/proxy/ProxyProviderViewPage.ts
+#: src/admin/providers/radius/RadiusProviderViewPage.ts
 msgid "Warning: Provider is not used by any Outpost."
 msgstr "Attention : ce fournisseur n’est utilisé par aucun avant-poste."
 
