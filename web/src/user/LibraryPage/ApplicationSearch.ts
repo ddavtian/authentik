@@ -1,15 +1,20 @@
-import { html } from "lit";
-import { ifDefined } from "lit/directives/if-defined.js";
-import Fuse from "fuse.js";
-import { getURLParam, updateURLParams } from "@goauthentik/elements/router/RouteMatch";
 import { AKElement } from "@goauthentik/elements/Base";
+import { getURLParam, updateURLParams } from "@goauthentik/elements/router/RouteMatch";
+import Fuse from "fuse.js";
+
 import { t } from "@lingui/macro";
+
+import { html } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
+import { ifDefined } from "lit/directives/if-defined.js";
+
 import PFBase from "@patternfly/patternfly/patternfly-base.css";
 import PFDisplay from "@patternfly/patternfly/utilities/Display/display.css";
-import { customEvent } from "./helpers";
 
 import type { Application } from "@goauthentik/api";
+
+import { SEARCH_ITEM_SELECTED, SEARCH_UPDATED } from "./constants";
+import { customEvent } from "./helpers";
 
 function fuseToApps(apps: Fuse.FuseResult<Application>[]): Application[] {
     return apps.map((item) => item.item);
@@ -50,10 +55,10 @@ export class LibraryPageApplicationList extends AKElement {
     onSelected(apps: Fuse.FuseResult<Application>[]) {
         const items = fuseToApps(apps);
         this.dispatchEvent(
-            customEvent("ak-library-search-updated", {
+            customEvent(SEARCH_UPDATED, {
                 selectedApp: items[0],
                 filteredApps: items,
-            })
+            }),
         );
     }
 
@@ -100,7 +105,7 @@ export class LibraryPageApplicationList extends AKElement {
                 return;
             }
             case "Enter": {
-                this.dispatchEvent(customEvent("ak-library-item-selected"));
+                this.dispatchEvent(customEvent(SEARCH_ITEM_SELECTED));
                 return;
             }
         }

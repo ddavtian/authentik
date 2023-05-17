@@ -1,16 +1,18 @@
-import { AKElement } from "@goauthentik/elements/Base";
 import { LayoutType } from "@goauthentik/common/ui/config";
+import { AKElement } from "@goauthentik/elements/Base";
+
+import { css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { html, css } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
 
-import PFBase from "@patternfly/patternfly/patternfly-base.css";
 import PFContent from "@patternfly/patternfly/components/Content/content.css";
 import PFEmptyState from "@patternfly/patternfly/components/EmptyState/empty-state.css";
 import PFGrid from "@patternfly/patternfly/layouts/Grid/grid.css";
+import PFBase from "@patternfly/patternfly/patternfly-base.css";
 
 import type { Application } from "@goauthentik/api";
-import type { AppGroupList, AppGroupEntry } from "./types";
+
+import type { AppGroupEntry, AppGroupList } from "./types";
 
 type Pair = [string, string];
 
@@ -48,7 +50,7 @@ export class LibraryPageApplicationList extends AKElement {
 
     @property({ attribute: true }) background: string | undefined = undefined;
 
-    @property({ attribute: true }) selected: string = "";
+    @property({ attribute: true }) selected = "";
 
     @property() apps: AppGroupList = [];
 

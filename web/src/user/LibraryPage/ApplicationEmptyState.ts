@@ -1,15 +1,18 @@
-import { customElement, state } from "lit/decorators.js";
-import { html, css } from "lit";
-import { t } from "@lingui/macro";
-import { AKElement } from "@goauthentik/elements/Base";
-import { SessionUser } from "@goauthentik/api";
 import { me } from "@goauthentik/common/users";
+import { AKElement } from "@goauthentik/elements/Base";
 import { paramURL } from "@goauthentik/elements/router/RouterOutlet";
+
+import { t } from "@lingui/macro";
+
+import { css, html } from "lit";
+import { customElement, state } from "lit/decorators.js";
 
 import PFContent from "@patternfly/patternfly/components/Content/content.css";
 import PFEmptyState from "@patternfly/patternfly/components/EmptyState/empty-state.css";
-import PFSpacing from "@patternfly/patternfly/utilities/Spacing/spacing.css";
 import PFBase from "@patternfly/patternfly/patternfly-base.css";
+import PFSpacing from "@patternfly/patternfly/utilities/Spacing/spacing.css";
+
+import { SessionUser } from "@goauthentik/api";
 
 /**
  * Library Page Application List Empty
@@ -36,7 +39,7 @@ export class LibraryPageApplicationEmptyList extends AKElement {
         `,
     ];
 
-    @state() isSuperUser: boolean = false;
+    @state() isSuperUser = false;
 
     connectedCallback() {
         super.connectedCallback();

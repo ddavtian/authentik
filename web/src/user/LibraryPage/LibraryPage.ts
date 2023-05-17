@@ -1,67 +1,18 @@
-import { css, html } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
 import { DEFAULT_CONFIG } from "@goauthentik/common/api/config";
-import { Application, CoreApi } from "@goauthentik/api";
-import { groupBy } from "@goauthentik/common/utils";
+import { me } from "@goauthentik/common/users";
 import { AKElement, rootInterface } from "@goauthentik/elements/Base";
-import { PaginatedResponse } from "@goauthentik/elements/table/Table";
-import { t } from "@lingui/macro";
-import PFContent from "@patternfly/patternfly/components/Content/content.css";
-import PFEmptyState from "@patternfly/patternfly/components/EmptyState/empty-state.css";
-import PFPage from "@patternfly/patternfly/components/Page/page.css";
-import PFBase from "@patternfly/patternfly/patternfly-base.css";
-import PFDisplay from "@patternfly/patternfly/utilities/Display/display.css";
-import { isCustomEvent, loading } from "./helpers";
-
 import "@goauthentik/elements/EmptyState";
-import "@goauthentik/user/LibraryApplication";
-import "./ApplicationEmptyState";
-import "./ApplicationSearch";
-import "./ApplicationList";
+import { PaginatedResponse } from "@goauthentik/elements/table/Table";
 
-import type { AppGroupList } from "./types";
+import { t } from "@lingui/macro";
 
-const isFullUrlRe = new RegExp("://");
-const isHttpRe = new RegExp("http(s?)://");
-const isNotFullUrl = (url: string) => !isFullUrlRe.test(url);
-const isHttp = (url: string) => isHttpRe.test(url);
+import { html } from "lit";
+import { customElement, state } from "lit/decorators.js";
 
-const appHasLaunchUrl = (app: Application) => {
-    const url = app.launchUrl;
-    return !!(typeof url === "string" && url !== "" && (isHttp(url) || isNotFullUrl(url)));
-};
+import { Application, CoreApi } from "@goauthentik/api";
 
-const filterApps = (apps: Application[]): Application[] => apps.filter(appHasLaunchUrl);
-
-const styles = [PFBase, PFDisplay, PFEmptyState, PFPage, PFContent].concat(css`
-    :host,
-    main {
-        padding: 3% 5%;
-    }
-    .header {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-    }
-    .header input {
-        width: 30ch;
-        box-sizing: border-box;
-        border: 0;
-        border-bottom: 1px solid;
-        border-bottom-color: #fd4b2d;
-        background-color: transparent;
-        font-size: 1.5rem;
-    }
-    .header input:focus {
-        outline: 0;
-    }
-    .pf-c-page__main {
-        overflow: hidden;
-    }
-    .pf-c-page__main-section {
-        background-color: transparent;
-    }
-`);
+import "./LibraryPageImpl";
+import type { PageUIConfig } from "./types";
 
 /**
  * List of Applications available
@@ -77,107 +28,63 @@ const styles = [PFBase, PFDisplay, PFEmptyState, PFPage, PFContent].concat(css`
 
 @customElement("ak-library")
 export class LibraryPage extends AKElement {
-    @property({ attribute: false })
-    apps?: PaginatedResponse<Application>;
+    @state()
+    ready = false;
 
     @state()
-    selectedApp?: Application;
+    isAdmin = false;
 
     @state()
-    filteredApps: Application[] = [];
+    apps!: PaginatedResponse<Application>;
 
-    static styles = styles;
+    @state()
+    uiConfig: PageUIConfig;
 
     constructor() {
         super();
-        new CoreApi(DEFAULT_CONFIG).coreApplicationsList({}).then((apps) => {
-            this.apps = apps;
-            this.filteredApps = apps.results;
+        const applicationListFetch = new CoreApi(DEFAULT_CONFIG).coreApplicationsList({});
+        const meFetch = me();
+        const uiConfig = rootInterface()?.uiConfig;
+        if (!uiConfig) {
+            throw new Error("Could not retrieve uiConfig. Reason: unknown. Check logs.");
+        }
+
+        this.uiConfig = {
+            layout: uiConfig.layout.type,
+            background: uiConfig.theme.cardBackground,
+            searchEnabled: uiConfig.enabledFeatures.search,
+        };
+
+        Promise.allSettled([applicationListFetch, meFetch]).then(([applicationListStatus, meStatus]) => {
+            if (meStatus.status === "rejected") {
+                throw new Error(`Could not determine status of user. Reason: ${meStatus.reason}`);
+            }
+            if (applicationListStatus.status === "rejected") {
+                throw new Error(`Could not retrieve list of applications. Reason: ${applicationListStatus.reason}`);
+            }
+            this.isAdmin = meStatus.value.user.isSuperuser;
+            this.apps = applicationListStatus.value;
+            this.ready = true;
         });
-        this.searchUpdated = this.searchUpdated.bind(this);
-        this.launchRequest = this.launchRequest.bind(this);
     }
 
     pageTitle(): string {
         return t`My Applications`;
     }
 
-    connectedCallback() {
-        super.connectedCallback();
-        this.addEventListener("ak-library-search-updated", this.searchUpdated);
-        this.addEventListener("ak-library-item-selected", this.launchRequest);
+    loading() {
+        return html`<ak-empty-state ?loading="${true}" header=${t`Loading`}> </ak-empty-state>`;
     }
 
-    disconnectedCallback() {
-        this.removeEventListener("ak-library-search-updated", this.searchUpdated);
-        this.removeEventListener("ak-library-item-selected", this.launchRequest);
-        super.disconnectedCallback();
-    }
-
-    searchUpdated(event: Event) {
-        if (!isCustomEvent(event)) {
-            throw new Error("ak-library-search-updated must send a custom event.");
-        }
-        event.stopPropagation();
-        this.selectedApp = event.detail.apps[0];
-        this.filteredApps = event.detail.apps;
-    }
-
-    launchRequest(event: Event) {
-        if (!isCustomEvent(event)) {
-            throw new Error("ak-library-item-selected must send a custom event");
-        }
-        event.stopPropagation();
-        const location = this.selectedApp?.launchUrl;
-        if (location) {
-            window.location.assign(location);
-        }
-    }
-
-    getApps(): AppGroupList {
-        return groupBy(filterApps(this.filteredApps), (app) => app.group || "");
-    }
-
-    renderEmptyState() {
-        return html`<ak-library-application-empty-list></ak-library-application-empty-list>`;
-    }
-
-    renderApps() {
-        const uiConfig = rootInterface()?.uiConfig;
-        if (!uiConfig) {
-            throw new Error("Library page cannot run without rootInterface configuration.");
-        }
-        const selected = this.selectedApp?.slug;
-        const apps = this.getApps();
-        const layout = uiConfig.layout.type as string;
-        const background = uiConfig.theme.cardBackground;
-
-        return html`<ak-library-application-list
-            layout="${layout}"
-            background="${background}"
-            selected="${selected}"
-            .apps=${apps}
-        ></ak-library-application-list>`;
-    }
-
-    renderSearch() {
-        return html`<ak-library-list-search .apps="{this.apps.results}"></ak-library-list-search>`;
+    running() {
+        return html`<ak-library-impl
+            ?isAdmin=${this.isAdmin}
+            .apps=${this.apps}
+            .uiConfig=${this.uiConfig}
+        ></ak-library-impl>`;
     }
 
     render() {
-        const searchEnabled = rootInterface()?.uiConfig?.enabledFeatures.search;
-
-        return html`<main role="main" class="pf-c-page__main" tabindex="-1" id="main-content">
-            <div class="pf-c-content header">
-                <h1>${t`My applications`}</h1>
-                ${searchEnabled ? this.renderSearch() : html``}
-            </div>
-            <section class="pf-c-page__main-section">
-                ${loading(
-                    this.apps,
-                    html`${filterApps(this.filteredApps).length > 0 ? this.renderApps() : this.renderEmptyState()}`
-                )}
-            </section>
-        </main>`;
+        return this.ready ? this.running() : this.loading();
     }
 }
